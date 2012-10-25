@@ -1,0 +1,32 @@
+###########################################
+## elasticsearch-star Configuration File ##
+###########################################
+[global]
+DEFAULT_TEMPLATE=smallcluster
+
+[aws info]
+AWS_ACCESS_KEY_ID = # FILL ME OUT
+AWS_SECRET_ACCESS_KEY = # FILL ME OUT
+AWS_USER_ID = # FILL ME OUT
+
+[key mykey]
+KEY_LOCATION=~/.ssh/id_rsa
+
+[cluster smallcluster]
+KEYNAME = mykey
+CLUSTER_SIZE = 1
+CLUSTER_USER = sgeadmin
+CLUSTER_SHELL = bash
+NODE_IMAGE_ID = ami-999d49f0
+NODE_INSTANCE_TYPE = t1.micro
+DISABLE_QUEUE=True
+PLUGINS = elasticsearch
+PERMISSIONS = elasticsearch
+
+[permission elasticsearch]
+PROTOCOL = tcp
+FROM_PORT = 9200
+TO_PORT = 9200
+
+[plugin elasticsearch]
+SETUP_CLASS = elasticsearch.Elasticsearch
