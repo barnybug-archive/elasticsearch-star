@@ -36,7 +36,7 @@ Currently as simple as:
     cp elasticsearch.py ~/.starcluster/plugins
     cp config.example ~/.starcluster/config
     emacs/vim ~/.starcluster/config # configure your keys / cluster
-    starcluster start -c 5 smallcluster # start a 5 node cluster
+    starcluster start -s 5 smallcluster # start a 5 node cluster
 
 Once the cluster is provisioned, the http url of elasticsearch (the one on master) will be printed
 back to the console.
