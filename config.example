@@ -20,13 +20,19 @@ CLUSTER_SHELL = bash
 NODE_IMAGE_ID = ami-999d49f0
 NODE_INSTANCE_TYPE = t1.micro
 DISABLE_QUEUE=True
-PLUGINS = elasticsearch
+PLUGINS = elasticsearchstar
 PERMISSIONS = elasticsearch
+
+[plugin elasticsearchstar]
+SETUP_CLASS = elasticsearchstar.Elasticsearch
+# optional parameters:
+# version = 0.19.11
+# data_dir = /mnt/elasticsearch
+# heap_size = 256
 
 [permission elasticsearch]
 PROTOCOL = tcp
 FROM_PORT = 9200
 TO_PORT = 9200
-
-[plugin elasticsearch]
-SETUP_CLASS = elasticsearch.Elasticsearch
+# CIDR_IP = <your_ip>/32
+# add this in to secure elasticsearch access
