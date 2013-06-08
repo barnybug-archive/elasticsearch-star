@@ -85,8 +85,8 @@ Grid Engine), you can set:
 
 The plugin can be configured by adding to the [plugin elasticsearchstar] section:
 
-    version = 0.20.0.RC1
-(optional) Set the version of elasticsearch to use. Defaults to 0.19.11.
+    version = 0.90.0
+(optional) Set the version of elasticsearch to use. Defaults to 0.90.1.
 
     data_dir = /var/lib/elasticsearch
 (optional) Set an alternative place to store data directory on the instance.
