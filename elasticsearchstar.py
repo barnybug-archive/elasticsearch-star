@@ -17,8 +17,8 @@ Each elasticsearch node will be named to match the starcluster allocated node na
 eg master, node001, etc.
 
 Parameters:
-version = 0.90.1
-- set the version of elasticsearch to use. Defaults to 0.90.1.
+version = 2.3.5
+- set the version of elasticsearch to use. Defaults to 2.3.5.
 """
 
 SCRIPT = '''
@@ -35,10 +35,8 @@ exec > setup.log 2>&1
 echo '** starcluster elasticsearch setup script **'
 
 elasticsearch_deb_url=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-%%version.deb
-cloud_aws_url='https://github.com/downloads/elasticsearch/elasticsearch-cloud-aws/elasticsearch-cloud-aws-1.9.0.zip'
 # store files under starcluster nfs share so only downloaded once
 debfile=/home/sgeadmin/elasticsearch-%%version.deb
-cloud_aws_file=/home/sgeadmin/elasticsearch-cloud-aws-1.12.0.zip
 
 # use already downloaded version if present
 if [ -e $debfile ]; then
@@ -48,21 +46,13 @@ else
   wget -q $elasticsearch_deb_url -O $debfile
 fi
 
-# use already downloaded version if present
-if [ -e $cloud_aws_file ]; then
-  echo "** skipping download, using existing $cloud_aws_file"
-else
-  echo "** downloading $cloud_aws_file"
-  wget -q $cloud_aws_url -O $cloud_aws_file
-fi
-
 echo "** installing $debfile"
 dpkg --force-confold -i $debfile
 # installing the deb attempts to start elasticsearch, this is expected to fail
 # as the cloud-aws plugin mentioned in configuration is not present yet. next...
 
-echo "** installing $cloud_aws_file"
-/usr/share/elasticsearch/bin/plugin -url file:$cloud_aws_file -install cloud-aws
+echo "** installing cloud plugin"
+/usr/share/elasticsearch/bin/plugin install -b cloud-aws
 
 echo "** creating data dir"
 mkdir -p %%data_dir
@@ -99,13 +89,13 @@ DATA_DIR=%%data_dir
 class Template(string.Template):
     delimiter = '%%'
 
-re_valid_version = re.compile(r'^\d\.\d\d\.\d\d?(\.RC\d+)?$')
+re_valid_version = re.compile(r'^\d\.\d+\.\d+(\.RC\d+)?$')
  
 class Elasticsearch(ClusterSetup):
     """
     Installs and configures an elasticsearch cluster on starcluster
     """
-    def __init__(self, version='0.90.1', data_dir=None, heap_size=None):
+    def __init__(self, version='2.3.5', data_dir=None, heap_size=None):
         if not re_valid_version.match(version):
             raise exception.ValidationError('Elasticsearch version should be format x.y.z[.RCn]: %s' % version)
         self.version = version
@@ -122,9 +112,10 @@ class Elasticsearch(ClusterSetup):
 
     def _params(self, node):
         # template parameters common to all nodes
+        clustername = node.parent_cluster.name.replace('@sc-', '')
         return dict(
             version=self.version,
-            clustername=node.parent_cluster,
+            clustername=clustername,
             access_key=node.ec2._conn.aws_access_key_id,
             secret_key=node.ec2._conn.aws_secret_access_key,
             region=node.ec2._conn.region.name,
